@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="倒水挑战">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>倒水挑战 - 精准控制游戏</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <h1>💧 倒水挑战</h1>
+            <p class="subtitle">控制水位，挑战精准度！</p>
+        </header>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-label">回合</span>
+                <span class="stat-value" id="round">1</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">得分</span>
+                <span class="stat-value" id="score">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">最高分</span>
+                <span class="stat-value" id="highScore">0</span>
+            </div>
+        </div>
+
+        <div class="target-display">
+            <div class="target-label">目标水位</div>
+            <div class="target-value" id="targetPercent">50%</div>
+        </div>
+
+        <div class="game-area">
+            <!-- 水龙头 -->
+            <div class="faucet">
+                <div class="faucet-body"></div>
+                <div class="faucet-spout"></div>
+                <div class="water-stream" id="waterStream"></div>
+            </div>
+
+            <!-- 杯子 -->
+            <div class="glass-container">
+                <div class="glass">
+                    <div class="water" id="water"></div>
+                    <div class="glass-shine"></div>
+                    <div class="target-line" id="targetLine">
+                        <span class="target-marker">目标</span>
+                    </div>
+                </div>
+                <div class="glass-base"></div>
+            </div>
+
+        </div>
+
+        <div class="control-area">
+            <button class="pour-button" id="pourButton">
+                <span class="button-icon">💧</span>
+                <span class="button-text">按住倒水</span>
+            </button>
+            <p class="control-hint">按住按钮开始倒水，松开停止</p>
+        </div>
+
+        <div class="action-buttons">
+            <button class="action-btn confirm-btn" id="confirmBtn" disabled>
+                ✓ 确认水位
+            </button>
+            <button class="action-btn reset-btn" id="resetBtn">
+                ↺ 重新开始
+            </button>
+        </div>
+
+        <!-- 结果弹窗 -->
+        <div class="result-modal" id="resultModal">
+            <div class="modal-content">
+                <div class="result-icon" id="resultIcon">🎉</div>
+                <h2 class="result-title" id="resultTitle">太棒了！</h2>
+                <div class="result-details">
+                    <p>目标水位: <span id="resultTarget">50%</span></p>
+                    <p>你的水位: <span id="resultActual">48%</span></p>
+                    <p>误差: <span id="resultError">2%</span></p>
+                </div>
+                <div class="result-score" id="resultScore">+100分</div>
+                <div class="modal-buttons">
+                    <button class="next-btn" id="nextBtn">下一关</button>
+                    <button class="restart-btn" id="restartBtn">🔄 重新开始</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+
+</html>

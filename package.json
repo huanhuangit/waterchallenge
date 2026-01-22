@@ -1,0 +1,22 @@
+{
+    "name": "water-challenge",
+    "version": "1.0.0",
+    "description": "倒水挑战 - 精准控制水位的益智小游戏",
+    "main": "index.html",
+    "scripts": {
+        "dev": "npx http-server . -p 3000 -c-1",
+        "build": "cp index.html style.css game.js www/",
+        "sync": "npm run build && npx cap sync",
+        "open:ios": "npx cap open ios",
+        "open:android": "npx cap open android",
+        "test": "npm run build && npx http-server www -p 3000 -c-1"
+    },
+    "author": "melindazimu",
+    "license": "MIT",
+    "dependencies": {
+        "@capacitor/android": "^8.0.1",
+        "@capacitor/cli": "^8.0.1",
+        "@capacitor/core": "^8.0.1",
+        "@capacitor/ios": "^8.0.1"
+    }
+}

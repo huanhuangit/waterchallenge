@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Capacitor native projects (keep for App development, but exclude from web deployment)
+# ios/
+# android/
+
+# Logs
+*.log
+npm-debug.log*
