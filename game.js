@@ -9,10 +9,12 @@ class WaterPouringGame {
         this.maxAttempts = 3; // 每关最多尝试次数
         this.score = 0;
         this.highScore = parseInt(localStorage.getItem('waterGameHighScore') || '0');
+        this.highScoreTime = localStorage.getItem('waterGameHighScoreTime') || '';
         this.pourSpeed = 0.3; // 初始水流速度
         this.allowedError = 5; // 初始允许误差5%
         this.gameEnded = false;
         this.gameOver = false; // 游戏结束标志
+        this.newRecordAchieved = false; // 本局是否破纪录
 
         // DOM 元素
         this.water = document.getElementById('water');
@@ -27,6 +29,8 @@ class WaterPouringGame {
         this.roundDisplay = document.getElementById('round');
         this.scoreDisplay = document.getElementById('score');
         this.highScoreDisplay = document.getElementById('highScore');
+        this.highScoreTimeDisplay = document.getElementById('highScoreTime');
+        this.clearScoreBtn = document.getElementById('clearScoreBtn');
 
         // 结果弹窗元素
         this.resultIcon = document.getElementById('resultIcon');
@@ -67,6 +71,9 @@ class WaterPouringGame {
 
         // 重置按钮
         this.resetBtn.addEventListener('click', () => this.resetGame());
+
+        // 清除最高分按钮
+        this.clearScoreBtn.addEventListener('click', () => this.clearHighScore());
 
         // 下一关按钮
         this.nextBtn.addEventListener('click', () => this.handleNextAction());
@@ -193,6 +200,11 @@ class WaterPouringGame {
 
     updateHighScoreDisplay() {
         this.highScoreDisplay.textContent = this.highScore;
+        if (this.highScoreTime) {
+            this.highScoreTimeDisplay.textContent = this.highScoreTime;
+        } else {
+            this.highScoreTimeDisplay.textContent = '';
+        }
     }
 
     confirmWaterLevel() {
@@ -218,8 +230,14 @@ class WaterPouringGame {
         // 更新最高分
         if (this.score > this.highScore) {
             this.highScore = this.score;
+            // 记录破纪录时间
+            const now = new Date();
+            this.highScoreTime = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
             localStorage.setItem('waterGameHighScore', this.highScore.toString());
+            localStorage.setItem('waterGameHighScoreTime', this.highScoreTime);
             this.updateHighScoreDisplay();
+            // 标记本局破纪录，游戏结束时再显示动画
+            this.newRecordAchieved = true;
         }
 
         // 判断是否游戏结束
@@ -232,22 +250,32 @@ class WaterPouringGame {
     }
 
     showResult(isSuccess, error, scoreChange) {
+        const restartBtn = document.getElementById('restartBtn');
+
         if (this.gameOver) {
             // 游戏结束
             this.resultIcon.textContent = '💔';
             this.resultTitle.textContent = '游戏结束！';
             this.resultTitle.className = 'result-title fail';
             this.nextBtn.textContent = '重新开始';
+            // 隐藏重复的重新开始按钮
+            restartBtn.style.display = 'none';
+            // 游戏结束时如果有新纪录，显示动画
+            if (this.newRecordAchieved) {
+                this.showNewRecordAnimation();
+            }
         } else if (isSuccess) {
             this.resultIcon.textContent = '🎉';
             this.resultTitle.textContent = '太棒了！';
             this.resultTitle.className = 'result-title success';
             this.nextBtn.textContent = '下一关';
+            restartBtn.style.display = 'block';
         } else {
             this.resultIcon.textContent = '😢';
             this.resultTitle.textContent = `还有${this.maxAttempts - this.attempts}次机会`;
             this.resultTitle.className = 'result-title fail';
             this.nextBtn.textContent = '再试一次';
+            restartBtn.style.display = 'block';
         }
 
         this.resultTarget.textContent = `${this.targetWaterLevel}%`;
@@ -297,7 +325,53 @@ class WaterPouringGame {
         this.gameOver = false;
         this.pourSpeed = 0.3;
         this.allowedError = 5;
+        this.newRecordAchieved = false;
         this.startNewRound();
+    }
+
+    // 破纪录动画
+    showNewRecordAnimation() {
+        const container = this.highScoreDisplay.closest('.high-score-container');
+        if (container) {
+            container.classList.add('new-record');
+            // 显示破纪录提示
+            this.showNewRecordToast();
+            // 3秒后移除动画类
+            setTimeout(() => {
+                container.classList.remove('new-record');
+            }, 3000);
+        }
+    }
+
+    // 显示破纪录提示
+    showNewRecordToast() {
+        // 创建提示元素
+        const toast = document.createElement('div');
+        toast.className = 'new-record-toast';
+        toast.innerHTML = '🏆 新纪录！';
+        document.body.appendChild(toast);
+
+        // 触发动画
+        requestAnimationFrame(() => {
+            toast.classList.add('show');
+        });
+
+        // 2.5秒后移除
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 2500);
+    }
+
+    // 清除最高分
+    clearHighScore() {
+        if (confirm('确定要清除最高分记录吗？')) {
+            this.highScore = 0;
+            this.highScoreTime = '';
+            localStorage.removeItem('waterGameHighScore');
+            localStorage.removeItem('waterGameHighScoreTime');
+            this.updateHighScoreDisplay();
+        }
     }
 }
 
