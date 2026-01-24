@@ -64,7 +64,7 @@ export default class Renderer {
         const topAreaH = headerH + statsH + targetH;
 
         // --- 底部区域计算 ---
-        const controlsH = 180; // 控制区高度
+        const controlsH = 220; // 控制区高度 (增加以容纳按钮+提示+底部按钮)
 
         // --- 中间游戏区域 ---
         const middleY = topPadding + topAreaH;
@@ -456,8 +456,8 @@ export default class Renderer {
 
         ctx.restore();
 
-        // 提示文字 (增加与按钮的距离)
-        const hintY = pourBtnY + btnRadius + this.p(35);
+        // 提示文字 (在按钮下方)
+        const hintY = pourBtnY + btnRadius + this.p(25);
         ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
         ctx.font = `${this.p(11)}px sans-serif`;
         ctx.textAlign = 'center';
@@ -465,7 +465,7 @@ export default class Renderer {
         ctx.fillText('按住按钮开始倒水，松开停止', cx, hintY);
 
         // 底部三个按钮 (在控制区底部)
-        const bottomBtnY = y + h - this.p(30);
+        const bottomBtnY = y + h - this.p(35);
         const btnH = this.p(44);
         const btnW1 = this.p(100); // 确认水位
         const btnW2 = this.p(130); // 重新开始
