@@ -105,8 +105,8 @@ export default class Renderer {
         // 4. Game Area (重点：自动适应中间区域)
         this.drawGameArea(ctx, logicW / 2, middleY, availableMiddleH, gameModel);
 
-        // 5. Controls
-        this.drawControls(ctx, logicW / 2, this.layout.controlsY, controlsH, gameModel);
+        // 5. Controls (传入cardW以便按钮宽度对齐)
+        this.drawControls(ctx, logicW / 2, this.layout.controlsY, controlsH, cardW - 40, gameModel);
 
         // 6. 结果弹窗 (居中覆盖)
         if (gameModel.gameEnded) {
@@ -399,13 +399,14 @@ export default class Renderer {
         ctx.restore();
     }
 
-    drawControls(ctx, lcx, ly, lh, model) {
+    drawControls(ctx, lcx, ly, lh, lContainerW, model) {
         const cx = this.p(lcx);
         const y = this.p(ly);
         const h = this.p(lh);
+        const containerW = this.p(lContainerW); // 与目标水位框宽度一致
 
         // 控制区布局 (使用比例分配):
-        // - 倒水按钮: 控制区顶部 30% 位置
+        // - 倒水按钮: 控制区顶部 22% 位置
         // - 提示文字: 按钮下方固定间距
         // - 底部按钮: 控制区底部 15% 位置
 
@@ -458,17 +459,20 @@ export default class Renderer {
         ctx.textBaseline = 'top';
         ctx.fillText('按住按钮开始倒水，松开停止', cx, hintY);
 
-        // 底部三个按钮 (在控制区底部 - 向上移动)
+        // 底部三个按钮 (与目标水位框宽度对齐)
         const bottomBtnY = y + h - this.p(45);
-        const btnH = this.p(42);
-        const btnW1 = this.p(95);  // 确认水位
-        const btnW2 = this.p(115); // 重新开始
-        const btnW3 = this.p(46);  // 清除按钮
+        const btnH = this.p(44);
         const btnSpacing = this.p(8);
 
-        // 计算总宽度并居中
-        const totalW = btnW1 + btnW2 + btnW3 + btnSpacing * 2;
-        const startX = cx - totalW / 2;
+        // 计算按钮宽度：总宽度 = containerW，按比例分配
+        // 确认水位: 35%, 重新开始: 45%, 清除: 20% (减去间距)
+        const availableW = containerW - btnSpacing * 2;
+        const btnW1 = availableW * 0.35;  // 确认水位
+        const btnW2 = availableW * 0.45;  // 重新开始
+        const btnW3 = availableW * 0.20;  // 清除按钮
+
+        // 左边起始位置
+        const startX = cx - containerW / 2;
 
         // 确认水位按钮
         const confirmX = startX + btnW1 / 2;
