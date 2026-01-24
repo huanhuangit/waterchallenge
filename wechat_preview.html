@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WeChat Mini Game Preview</title>
+    <style>
+        body { margin: 0; padding: 0; overflow: hidden; background: #000; }
+        canvas { display: block; width: 100vw; height: 100vh; }
+    </style>
+</head>
+<body>
+    <script>
+        // Mock wx API for Browser
+        window.wx = {
+            createCanvas: () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = window.innerWidth * window.devicePixelRatio;
+                canvas.height = window.innerHeight * window.devicePixelRatio;
+                document.body.appendChild(canvas);
+                return canvas;
+            },
+            getSystemInfoSync: () => ({
+                pixelRatio: window.devicePixelRatio,
+                windowWidth: window.innerWidth,
+                windowHeight: window.innerHeight,
+                batteryLevel: 100,
+                brand: "DevTools",
+                language: "zh_CN",
+                model: "Browser Preview",
+                platform: "devtools",
+                screenHeight: window.screen.height,
+                screenWidth: window.screen.width,
+                statusBarHeight: 20,
+                system: "Browser",
+                version: "1.0.0"
+            }),
+            onTouchStart: (cb) => {
+                window.addEventListener('touchstart', cb);
+                // Mouse adapter for PC debugging
+                window.addEventListener('mousedown', (e) => {
+                    cb({ touches: [{ clientX: e.clientX, clientY: e.clientY }] });
+                });
+            },
+            onTouchEnd: (cb) => {
+                window.addEventListener('touchend', cb);
+                window.addEventListener('mouseup', (e) => {
+                    cb({ changedTouches: [{ clientX: e.clientX, clientY: e.clientY }] });
+                });
+            },
+            getStorageSync: (key) => localStorage.getItem(key),
+            setStorageSync: (key, value) => localStorage.setItem(key, value),
+            removeStorageSync: (key) => localStorage.removeItem(key),
+            createImage: () => new Image(),
+        };
+
+        // Mock module system for ES6 imports in browser without build step
+        // We will load the modules directly as ES6 modules
+    </script>
+    <script type="module">
+        import Main from './miniprogram/js/main.js';
+        
+        // Fix for main.js assuming Logic/Renderer are in ./js/
+        // Since we are running from root, paths in main.js will be relative to main.js location
+        // which is miniprogram/js/main.js, so imports '../js/logic' work correctly relative to it.
+        
+        new Main();
+    </script>
+</body>
+</html>
