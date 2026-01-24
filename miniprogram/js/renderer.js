@@ -54,17 +54,17 @@ export default class Renderer {
         // 3. Middle Area: 游戏互动区 (自动填充剩余空间)
 
         const topPadding = 20 + 44; // 状态栏 + 顶部留白
-        const bottomPadding = 40; // Home Indicator
-        const sidePadding = 20;
+        const bottomPadding = 34; // Home Indicator
+        const sidePadding = 16;
 
         // --- 顶部区域计算 ---
-        const headerH = 90; // 标题 + 副标题 + 间距
-        const statsH = 80; // 状态栏
-        const targetH = 100; // 目标显示 + 间距
+        const headerH = 80; // 标题 + 副标题 + 间距
+        const statsH = 75; // 状态栏
+        const targetH = 90; // 目标显示 + 间距
         const topAreaH = headerH + statsH + targetH;
 
         // --- 底部区域计算 ---
-        const controlsH = 220; // 控制区高度 (增加以容纳按钮+提示+底部按钮)
+        const controlsH = 200; // 控制区高度 (优化后)
 
         // --- 中间游戏区域 ---
         const middleY = topPadding + topAreaH;
@@ -410,14 +410,14 @@ export default class Renderer {
         const y = this.p(ly);
         const h = this.p(lh);
 
-        // 控制区布局:
-        // 1. 倒水按钮 (圆形，居中偏上)
-        // 2. 提示文字 (按钮下方)
-        // 3. 三个底部按钮 (确认水位 | 重新开始 | 🗑️)
+        // 控制区布局 (使用比例分配):
+        // - 倒水按钮: 控制区顶部 30% 位置
+        // - 提示文字: 按钮下方固定间距
+        // - 底部按钮: 控制区底部 15% 位置
 
-        // 倒水按钮
-        const btnRadius = this.p(50);
-        const pourBtnY = y + this.p(60); // 在控制区顶部偏下
+        // 倒水按钮 (缩小一点)
+        const btnRadius = this.p(45);
+        const pourBtnY = y + h * 0.3;
 
         this.pourBtnArea = { x: cx, y: pourBtnY, r: btnRadius };
 
@@ -441,36 +441,36 @@ export default class Renderer {
 
         if (!model.isPouring) {
             ctx.shadowColor = 'rgba(100, 210, 255, 0.4)';
-            ctx.shadowBlur = this.p(15);
-            ctx.shadowOffsetY = this.p(8);
+            ctx.shadowBlur = this.p(12);
+            ctx.shadowOffsetY = this.p(6);
         }
 
         ctx.fillStyle = '#fff';
         ctx.textAlign = 'center';
         ctx.shadowBlur = 0;
         ctx.textBaseline = 'middle';
-        ctx.font = `${this.p(26)}px sans-serif`;
-        ctx.fillText('💧', 0, -this.p(8));
-        ctx.font = `bold ${this.p(12)}px sans-serif`;
-        ctx.fillText('按住倒水', 0, this.p(18));
+        ctx.font = `${this.p(22)}px sans-serif`;
+        ctx.fillText('💧', 0, -this.p(6));
+        ctx.font = `bold ${this.p(11)}px sans-serif`;
+        ctx.fillText('按住倒水', 0, this.p(16));
 
         ctx.restore();
 
         // 提示文字 (在按钮下方)
-        const hintY = pourBtnY + btnRadius + this.p(25);
+        const hintY = pourBtnY + btnRadius + this.p(18);
         ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-        ctx.font = `${this.p(11)}px sans-serif`;
+        ctx.font = `${this.p(10)}px sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.fillText('按住按钮开始倒水，松开停止', cx, hintY);
 
         // 底部三个按钮 (在控制区底部)
-        const bottomBtnY = y + h - this.p(35);
-        const btnH = this.p(44);
-        const btnW1 = this.p(100); // 确认水位
-        const btnW2 = this.p(130); // 重新开始
-        const btnW3 = this.p(50);  // 清除按钮
-        const btnSpacing = this.p(10);
+        const bottomBtnY = y + h - this.p(28);
+        const btnH = this.p(40);
+        const btnW1 = this.p(90);  // 确认水位
+        const btnW2 = this.p(110); // 重新开始
+        const btnW3 = this.p(44);  // 清除按钮
+        const btnSpacing = this.p(8);
 
         // 计算总宽度并居中
         const totalW = btnW1 + btnW2 + btnW3 + btnSpacing * 2;
