@@ -47,70 +47,88 @@ export default class Renderer {
         // 1. 全局背景
         this.drawBackground(ctx, w, h);
 
-        // --- 布局系统 (基于逻辑像素) ---
-        // 我们将屏幕垂直划分为几个区域
-        // 1. Top Area: 标题 + 状态栏 + 目标指示
-        // 2. Bottom Area: 控制按钮
-        // 3. Middle Area: 游戏互动区 (自动填充剩余空间)
+        // --- 响应式布局系统 ---
+        // 检测屏幕宽高比以适应不同设备
+        const aspectRatio = logicH / logicW;
+        const isTablet = logicW >= 500; // 平板模式
+        const isTallScreen = aspectRatio > 1.8; // 长屏手机 (如iPhone X系列)
+        const isShortScreen = aspectRatio < 1.5; // 短屏或平板
 
-        const topPadding = 20 + 44; // 状态栏 + 顶部留白
-        const bottomPadding = 34; // Home Indicator
-        const sidePadding = 16;
+        // 基础尺寸单位 (基于屏幕宽度的相对值)
+        const baseUnit = logicW / 375; // 以iPhone 8宽度为基准
 
-        // --- 顶部区域计算 ---
-        const headerH = 80; // 标题 + 副标题 + 间距
-        const statsH = 75; // 状态栏
-        const targetH = 90; // 目标显示 + 间距
+        // 安全区域 (根据屏幕类型动态调整)
+        const topPadding = isTallScreen ? 20 + 44 : 20 + 24; // iPhone X有更大刘海
+        const bottomPadding = isTallScreen ? 34 : 20; // iPhone X有Home Indicator
+        const sidePadding = Math.max(16, logicW * 0.04);
+
+        // --- 区域高度计算 (使用比例而非固定值) ---
+        // 顶部区域：占可用高度的一定比例，但有最小/最大值
+        const availableH = logicH - topPadding - bottomPadding;
+
+        const headerH = Math.max(70, Math.min(90, availableH * 0.10)) * baseUnit;
+        const statsH = Math.max(65, Math.min(80, availableH * 0.09)) * baseUnit;
+        const targetH = Math.max(80, Math.min(100, availableH * 0.11)) * baseUnit;
         const topAreaH = headerH + statsH + targetH;
 
-        // --- 底部区域计算 ---
-        const controlsH = 200; // 控制区高度 (优化后)
+        // 控制区高度：根据屏幕高度动态调整
+        const controlsH = Math.max(160, Math.min(220, availableH * 0.25)) * baseUnit;
 
-        // --- 中间游戏区域 ---
+        // 中间游戏区域
         const middleY = topPadding + topAreaH;
-        // 剩余高度 = 总高度 - 顶部起始 - 底部区域 - 底部安全区
         const availableMiddleH = logicH - middleY - controlsH - bottomPadding;
 
-        // 渲染坐标原点偏移 (用于卡片效果)
-        // 这里的策略是：内容居中显示在卡片内，卡片有最大宽度
-        const maxCardW = 400;
+        // 卡片宽度：平板上限制最大宽度，手机上撑满
+        const maxCardW = isTablet ? 420 : 400;
         const cardW = Math.min(logicW - sidePadding * 2, maxCardW);
         const cardX = (logicW - cardW) / 2;
 
-        // 为了视觉平衡，卡片高度设为内容总高度，或者撑满屏幕
-        // 这里采用撑满屏幕（留边距），内部元素相对布局
         const cardY = topPadding;
-        const cardH = logicH - topPadding - bottomPadding; // 简单起见，卡片占满垂直安全区
+        const cardH = logicH - topPadding - bottomPadding;
 
         // 绘制卡片背景
         this.drawCard(ctx, this.p(cardX), this.p(cardY), this.p(cardW), this.p(cardH));
 
-        // 记录控制区位置供点击检测 (逻辑坐标转物理坐标存储)
+        // 保存布局信息供后续使用
+        this.layoutInfo = {
+            baseUnit,
+            isTablet,
+            isTallScreen,
+            isShortScreen,
+            cardW,
+            cardY,
+            headerH,
+            statsH,
+            targetH,
+            controlsH
+        };
+
+        // 记录控制区位置供点击检测
         this.layout = {
             controlsY: cardY + cardH - controlsH,
             centerX: logicW / 2
         };
 
-        // --- 开始绘制各部分 (传入逻辑坐标，内部转物理坐标) ---
+        // --- 开始绘制各部分 ---
 
-        // 1. Header (标题在卡片顶部偏移20)
-        this.drawHeader(ctx, logicW / 2, cardY + 20);
+        // 1. Header
+        this.drawHeader(ctx, logicW / 2, cardY + 15 * baseUnit);
 
-        // 2. Stats (在headerH之后开始)
-        this.drawStats(ctx, logicW / 2, cardY + headerH + 5, cardW - 40, gameModel);
+        // 2. Stats
+        this.drawStats(ctx, logicW / 2, cardY + headerH + 5 * baseUnit, cardW - 40, gameModel);
 
-        // 3. Target (在stats之后)
-        this.drawTargetDisplay(ctx, logicW / 2, cardY + headerH + statsH + 15, cardW - 40, gameModel);
+        // 3. Target
+        this.drawTargetDisplay(ctx, logicW / 2, cardY + headerH + statsH + 10 * baseUnit, cardW - 40, gameModel);
 
-        // 4. Game Area (重点：自动适应中间区域)
+        // 4. Game Area
         this.drawGameArea(ctx, logicW / 2, middleY, availableMiddleH, gameModel);
 
-        // 5. Controls (传入cardW以便按钮宽度对齐)
+        // 5. Controls
         this.drawControls(ctx, logicW / 2, this.layout.controlsY, controlsH, cardW - 40, gameModel);
 
-        // 6. 结果弹窗 (居中覆盖)
+        // 6. 结果弹窗
         if (gameModel.gameEnded) {
-            // Main loop handles logic, we verify if specific rendering needed here
+            // Main loop handles logic
         }
     }
 
@@ -244,21 +262,26 @@ export default class Renderer {
         const startY = this.p(ly);
         const availableH = this.p(lAvailableH); // 物理像素可用高度
 
-        // 定义杯子标准尺寸 (逻辑像素) - 放大1.4倍
-        const LOGIC_GLASS_W = 140;
-        const LOGIC_GLASS_H = 196;
-        const LOGIC_FAUCET_SPACE = 84; // 水龙头需要的高度
-        const LOGIC_TOTAL_H = LOGIC_GLASS_H + LOGIC_FAUCET_SPACE + 10; // 减小边距
+        // 检测是否为平板模式
+        const isTablet = this.layoutInfo?.isTablet || false;
+        const baseUnit = this.layoutInfo?.baseUnit || 1;
+
+        // 定义杯子标准尺寸 (逻辑像素) - 平板上放大更多
+        const LOGIC_GLASS_W = isTablet ? 180 : 140;
+        const LOGIC_GLASS_H = isTablet ? 252 : 196;
+        const LOGIC_FAUCET_SPACE = isTablet ? 108 : 84;
+        const LOGIC_TOTAL_H = LOGIC_GLASS_H + LOGIC_FAUCET_SPACE + 10;
 
         const totalNeededH = this.p(LOGIC_TOTAL_H);
 
-        // 计算缩放比例：如果可用高度不够，就整体缩小
+        // 计算缩放比例
         let scale = 1.0;
         if (availableH < totalNeededH) {
             scale = availableH / totalNeededH;
         }
-        // 限制最大缩放，防止在大屏上过大
-        if (scale > 1.1) scale = 1.1; // 减小最大缩放限制
+        // 平板上允许更大的缩放
+        const maxScale = isTablet ? 1.5 : 1.1;
+        if (scale > maxScale) scale = maxScale;
 
         const glassW = this.p(LOGIC_GLASS_W) * scale;
         const glassH = this.p(LOGIC_GLASS_H) * scale;
