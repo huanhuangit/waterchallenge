@@ -474,14 +474,14 @@ export default class Renderer {
         // 左边起始位置
         const startX = cx - containerW / 2;
 
-        // 确认水位按钮 (绿色字体)
+        // 确认水位按钮 (柔和绿色字体)
         const confirmX = startX + btnW1 / 2;
-        this.drawButton(ctx, confirmX, bottomBtnY, btnW1, btnH, '✓ 确认水位', 'rgba(255,255,255,0.08)', true, '#4ade80');
+        this.drawButton(ctx, confirmX, bottomBtnY, btnW1, btnH, '✓ 确认水位', 'rgba(255,255,255,0.08)', true, '#86efac');
         this.confirmBtnArea = { x: confirmX, y: bottomBtnY, w: btnW1, h: btnH };
 
-        // 重新开始按钮 (红色字体)
+        // 重新开始按钮 (柔和橙粉色字体)
         const resetX = startX + btnW1 + btnSpacing + btnW2 / 2;
-        this.drawButton(ctx, resetX, bottomBtnY, btnW2, btnH, '↺ 重新开始', 'rgba(255,255,255,0.08)', true, '#f87171');
+        this.drawButton(ctx, resetX, bottomBtnY, btnW2, btnH, '↺ 重新开始', 'rgba(255,255,255,0.08)', true, '#fca5a5');
         this.resetBtnArea = { x: resetX, y: bottomBtnY, w: btnW2, h: btnH };
 
         // 清除最高分按钮
