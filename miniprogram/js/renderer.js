@@ -244,11 +244,11 @@ export default class Renderer {
         const startY = this.p(ly);
         const availableH = this.p(lAvailableH); // 物理像素可用高度
 
-        // 定义杯子标准尺寸 (逻辑像素)
-        const LOGIC_GLASS_W = 100;
-        const LOGIC_GLASS_H = 140;
-        const LOGIC_FAUCET_SPACE = 60; // 水龙头需要的高度
-        const LOGIC_TOTAL_H = LOGIC_GLASS_H + LOGIC_FAUCET_SPACE + 20; // +20 margin
+        // 定义杯子标准尺寸 (逻辑像素) - 放大1.4倍
+        const LOGIC_GLASS_W = 140;
+        const LOGIC_GLASS_H = 196;
+        const LOGIC_FAUCET_SPACE = 84; // 水龙头需要的高度
+        const LOGIC_TOTAL_H = LOGIC_GLASS_H + LOGIC_FAUCET_SPACE + 10; // 减小边距
 
         const totalNeededH = this.p(LOGIC_TOTAL_H);
 
@@ -258,7 +258,7 @@ export default class Renderer {
             scale = availableH / totalNeededH;
         }
         // 限制最大缩放，防止在大屏上过大
-        if (scale > 1.2) scale = 1.2;
+        if (scale > 1.1) scale = 1.1; // 减小最大缩放限制
 
         const glassW = this.p(LOGIC_GLASS_W) * scale;
         const glassH = this.p(LOGIC_GLASS_H) * scale;
