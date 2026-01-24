@@ -153,7 +153,7 @@ export default class Renderer {
         ctx.font = `bold ${this.p(24)}px sans-serif`;
         ctx.shadowColor = 'rgba(100, 200, 255, 0.5)';
         ctx.shadowBlur = this.p(15);
-        ctx.fillText('💧 倒水挑战', cx, y);
+        ctx.fillText('💧 接水大挑战', cx, y);
 
         ctx.shadowBlur = 0;
         ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';

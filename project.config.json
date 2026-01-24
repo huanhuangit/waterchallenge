@@ -18,7 +18,7 @@
     "checkInvalidSitemap": true
   },
   "appid": "touristappid",
-  "projectname": "water-pouring-game",
+  "projectname": "接水大挑战",
   "libVersion": "2.19.4",
   "simulatorType": "wechat",
   "simulatorPluginLibVersion": {},
