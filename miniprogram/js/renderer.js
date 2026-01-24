@@ -53,18 +53,18 @@ export default class Renderer {
         // 2. Bottom Area: 控制按钮
         // 3. Middle Area: 游戏互动区 (自动填充剩余空间)
 
-        const topPadding = 20 + 44 + 40; // 状态栏 + 顶部留白 + 额外空间
-        const bottomPadding = 80; // Home Indicator + 额外底部空间
+        const topPadding = 20 + 44; // 状态栏 + 顶部留白
+        const bottomPadding = 40; // Home Indicator
         const sidePadding = 20;
 
         // --- 顶部区域计算 ---
-        const headerH = 60;
-        const statsH = 70;
-        const targetH = 80;
+        const headerH = 90; // 标题 + 副标题 + 间距
+        const statsH = 80; // 状态栏
+        const targetH = 100; // 目标显示 + 间距
         const topAreaH = headerH + statsH + targetH;
 
         // --- 底部区域计算 ---
-        const controlsH = 160;
+        const controlsH = 180; // 控制区高度
 
         // --- 中间游戏区域 ---
         const middleY = topPadding + topAreaH;
@@ -93,14 +93,14 @@ export default class Renderer {
 
         // --- 开始绘制各部分 (传入逻辑坐标，内部转物理坐标) ---
 
-        // 1. Header
-        this.drawHeader(ctx, logicW / 2, cardY + 30);
+        // 1. Header (标题在卡片顶部偏移20)
+        this.drawHeader(ctx, logicW / 2, cardY + 20);
 
-        // 2. Stats
-        this.drawStats(ctx, logicW / 2, cardY + headerH, cardW - 40, gameModel);
+        // 2. Stats (在headerH之后开始)
+        this.drawStats(ctx, logicW / 2, cardY + headerH + 5, cardW - 40, gameModel);
 
-        // 3. Target
-        this.drawTargetDisplay(ctx, logicW / 2, cardY + headerH + statsH + 10, cardW - 40, gameModel);
+        // 3. Target (在stats之后)
+        this.drawTargetDisplay(ctx, logicW / 2, cardY + headerH + statsH + 15, cardW - 40, gameModel);
 
         // 4. Game Area (重点：自动适应中间区域)
         this.drawGameArea(ctx, logicW / 2, middleY, availableMiddleH, gameModel);
