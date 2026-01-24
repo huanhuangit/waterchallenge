@@ -53,8 +53,8 @@ export default class Renderer {
         // 2. Bottom Area: 控制按钮
         // 3. Middle Area: 游戏互动区 (自动填充剩余空间)
 
-        const topPadding = 20 + 44; // 状态栏 + 顶部留白
-        const bottomPadding = 34; // Home Indicator
+        const topPadding = 20 + 44 + 40; // 状态栏 + 顶部留白 + 额外空间
+        const bottomPadding = 80; // Home Indicator + 额外底部空间
         const sidePadding = 20;
 
         // --- 顶部区域计算 ---
