@@ -94,7 +94,7 @@ export default class Renderer {
         // --- 开始绘制各部分 (传入逻辑坐标，内部转物理坐标) ---
 
         // 1. Header
-        this.drawHeader(ctx, logicW / 2, cardY + 10);
+        this.drawHeader(ctx, logicW / 2, cardY + 30);
 
         // 2. Stats
         this.drawStats(ctx, logicW / 2, cardY + headerH, cardW - 40, gameModel);
@@ -400,7 +400,7 @@ export default class Renderer {
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
         ctx.font = `bold ${this.p(10) * scale}px sans-serif`;
-        ctx.fillText('目标', w + this.p(18) * scale, targetLineY);
+        ctx.fillText('目标', w + this.p(18) * scale, targetLineY + this.p(4) * scale);
 
         ctx.restore();
     }
