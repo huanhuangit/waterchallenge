@@ -456,8 +456,8 @@ export default class Renderer {
 
         ctx.restore();
 
-        // 提示文字
-        const hintY = pourBtnY + btnRadius + this.p(20);
+        // 提示文字 (增加与按钮的距离)
+        const hintY = pourBtnY + btnRadius + this.p(35);
         ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
         ctx.font = `${this.p(11)}px sans-serif`;
         ctx.textAlign = 'center';
