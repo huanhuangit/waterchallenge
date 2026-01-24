@@ -465,23 +465,23 @@ export default class Renderer {
         const btnSpacing = this.p(8);
 
         // 计算按钮宽度：总宽度 = containerW，按比例分配
-        // 确认水位: 35%, 重新开始: 45%, 清除: 20% (减去间距)
+        // 确认水位: 40%, 重新开始: 40%, 清除: 20% (减去间距)
         const availableW = containerW - btnSpacing * 2;
-        const btnW1 = availableW * 0.35;  // 确认水位
-        const btnW2 = availableW * 0.45;  // 重新开始
+        const btnW1 = availableW * 0.40;  // 确认水位
+        const btnW2 = availableW * 0.40;  // 重新开始
         const btnW3 = availableW * 0.20;  // 清除按钮
 
         // 左边起始位置
         const startX = cx - containerW / 2;
 
-        // 确认水位按钮
+        // 确认水位按钮 (绿色字体)
         const confirmX = startX + btnW1 / 2;
-        this.drawButton(ctx, confirmX, bottomBtnY, btnW1, btnH, '✓ 确认水位', 'rgba(255,255,255,0.08)', true);
+        this.drawButton(ctx, confirmX, bottomBtnY, btnW1, btnH, '✓ 确认水位', 'rgba(255,255,255,0.08)', true, '#4ade80');
         this.confirmBtnArea = { x: confirmX, y: bottomBtnY, w: btnW1, h: btnH };
 
-        // 重新开始按钮
+        // 重新开始按钮 (红色字体)
         const resetX = startX + btnW1 + btnSpacing + btnW2 / 2;
-        this.drawButton(ctx, resetX, bottomBtnY, btnW2, btnH, '↺ 重新开始', 'rgba(255,255,255,0.08)', true);
+        this.drawButton(ctx, resetX, bottomBtnY, btnW2, btnH, '↺ 重新开始', 'rgba(255,255,255,0.08)', true, '#f87171');
         this.resetBtnArea = { x: resetX, y: bottomBtnY, w: btnW2, h: btnH };
 
         // 清除最高分按钮
@@ -490,7 +490,7 @@ export default class Renderer {
         this.clearBtnArea = { x: clearX, y: bottomBtnY, w: btnW3, h: btnH };
     }
 
-    drawButton(ctx, x, y, w, h, text, color, isOutline = false) {
+    drawButton(ctx, x, y, w, h, text, color, isOutline = false, textColor = '#fff') {
         ctx.save();
         ctx.translate(x, y);
 
@@ -509,8 +509,8 @@ export default class Renderer {
             ctx.stroke();
         }
 
-        ctx.fillStyle = '#fff';
-        ctx.font = `bold ${this.p(19)}px sans-serif`; // 字体放大1.2倍
+        ctx.fillStyle = textColor;
+        ctx.font = `bold ${this.p(19)}px sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.shadowBlur = 0;
