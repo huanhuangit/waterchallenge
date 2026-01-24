@@ -458,8 +458,8 @@ export default class Renderer {
         ctx.textBaseline = 'top';
         ctx.fillText('按住按钮开始倒水，松开停止', cx, hintY);
 
-        // 底部三个按钮 (在控制区底部)
-        const bottomBtnY = y + h - this.p(28);
+        // 底部三个按钮 (在控制区底部 - 向上移动)
+        const bottomBtnY = y + h - this.p(45);
         const btnH = this.p(42);
         const btnW1 = this.p(95);  // 确认水位
         const btnW2 = this.p(115); // 重新开始
@@ -506,7 +506,7 @@ export default class Renderer {
         }
 
         ctx.fillStyle = '#fff';
-        ctx.font = `bold ${this.p(16)}px sans-serif`;
+        ctx.font = `bold ${this.p(19)}px sans-serif`; // 字体放大1.2倍
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.shadowBlur = 0;

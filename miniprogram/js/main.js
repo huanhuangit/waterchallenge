@@ -97,6 +97,11 @@ export default class Main {
         if (this.isInRect(cx, cy, r.resetBtnArea)) {
             this.game.resetGame();
         }
+
+        // 清除最高分按钮
+        if (this.isInRect(cx, cy, r.clearBtnArea)) {
+            this.game.clearHighScore();
+        }
     }
 
     handleInputEnd() {
