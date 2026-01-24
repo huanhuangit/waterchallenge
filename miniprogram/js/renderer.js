@@ -410,18 +410,19 @@ export default class Renderer {
         const y = this.p(ly);
         const h = this.p(lh);
 
-        const centerY = y + h / 2;
+        // 控制区布局:
+        // 1. 倒水按钮 (圆形，居中偏上)
+        // 2. 提示文字 (按钮下方)
+        // 3. 三个底部按钮 (确认水位 | 重新开始 | 🗑️)
 
         // 倒水按钮
         const btnRadius = this.p(50);
-        // 确保不会贴底，稍微向上
-        const btnY = centerY - this.p(10);
+        const pourBtnY = y + this.p(60); // 在控制区顶部偏下
 
-        // 保存点击区域 (物理坐标)
-        this.pourBtnArea = { x: cx, y: btnY, r: btnRadius };
+        this.pourBtnArea = { x: cx, y: pourBtnY, r: btnRadius };
 
         ctx.save();
-        ctx.translate(cx, btnY);
+        ctx.translate(cx, pourBtnY);
 
         const btnGrad = ctx.createLinearGradient(-btnRadius, -btnRadius, btnRadius, btnRadius);
         if (model.isPouring) {
@@ -448,29 +449,47 @@ export default class Renderer {
         ctx.textAlign = 'center';
         ctx.shadowBlur = 0;
         ctx.textBaseline = 'middle';
-        ctx.font = `${this.p(30)}px sans-serif`;
-        ctx.fillText('💧', 0, -this.p(10));
-        ctx.font = `bold ${this.p(14)}px sans-serif`;
-        ctx.fillText('按住倒水', 0, this.p(20));
+        ctx.font = `${this.p(26)}px sans-serif`;
+        ctx.fillText('💧', 0, -this.p(8));
+        ctx.font = `bold ${this.p(12)}px sans-serif`;
+        ctx.fillText('按住倒水', 0, this.p(18));
 
         ctx.restore();
 
-        // 左右按钮
-        const btnW = this.p(90);
-        const btnH = this.p(40);
-        const spacing = this.p(20);
+        // 提示文字
+        const hintY = pourBtnY + btnRadius + this.p(20);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.font = `${this.p(11)}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText('按住按钮开始倒水，松开停止', cx, hintY);
 
-        const confirmX = cx - btnRadius - spacing - btnW / 2;
-        if (model.currentWaterLevel > 0 && !model.gameEnded) {
-            this.drawButton(ctx, confirmX, btnY, btnW, btnH, '✓ 确认', '#5dff64');
-            this.confirmBtnArea = { x: confirmX, y: btnY, w: btnW, h: btnH };
-        } else {
-            this.confirmBtnArea = null;
-        }
+        // 底部三个按钮 (在控制区底部)
+        const bottomBtnY = y + h - this.p(30);
+        const btnH = this.p(44);
+        const btnW1 = this.p(100); // 确认水位
+        const btnW2 = this.p(130); // 重新开始
+        const btnW3 = this.p(50);  // 清除按钮
+        const btnSpacing = this.p(10);
 
-        const resetX = cx + btnRadius + spacing + btnW / 2;
-        this.drawButton(ctx, resetX, btnY, btnW, btnH, '↺ 重置', 'rgba(255,255,255,0.1)', true);
-        this.resetBtnArea = { x: resetX, y: btnY, w: btnW, h: btnH };
+        // 计算总宽度并居中
+        const totalW = btnW1 + btnW2 + btnW3 + btnSpacing * 2;
+        const startX = cx - totalW / 2;
+
+        // 确认水位按钮
+        const confirmX = startX + btnW1 / 2;
+        this.drawButton(ctx, confirmX, bottomBtnY, btnW1, btnH, '✓ 确认水位', 'rgba(255,255,255,0.08)', true);
+        this.confirmBtnArea = { x: confirmX, y: bottomBtnY, w: btnW1, h: btnH };
+
+        // 重新开始按钮
+        const resetX = startX + btnW1 + btnSpacing + btnW2 / 2;
+        this.drawButton(ctx, resetX, bottomBtnY, btnW2, btnH, '↺ 重新开始', 'rgba(255,255,255,0.08)', true);
+        this.resetBtnArea = { x: resetX, y: bottomBtnY, w: btnW2, h: btnH };
+
+        // 清除最高分按钮
+        const clearX = startX + btnW1 + btnSpacing + btnW2 + btnSpacing + btnW3 / 2;
+        this.drawButton(ctx, clearX, bottomBtnY, btnW3, btnH, '🗑️', 'rgba(255,255,255,0.08)', true);
+        this.clearBtnArea = { x: clearX, y: bottomBtnY, w: btnW3, h: btnH };
     }
 
     drawButton(ctx, x, y, w, h, text, color, isOutline = false) {
