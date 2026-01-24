@@ -157,7 +157,7 @@ export default class Renderer {
 
         ctx.shadowBlur = 0;
         ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-        ctx.font = `${this.p(12)}px sans-serif`;
+        ctx.font = `${this.p(16)}px sans-serif`;
         ctx.fillText('控制水位，挑战精准度！', cx, y + this.p(35));
     }
 
@@ -174,9 +174,9 @@ export default class Renderer {
         ctx.fill();
 
         const itemW = w / 3;
-        const fontLabel = this.p(11);
-        const fontVal = this.p(20);
-        const fontSub = this.p(9);
+        const fontLabel = this.p(14);
+        const fontVal = this.p(26);
+        const fontSub = this.p(12);
 
         const drawItem = (label, value, idx, subText = null) => {
             const ix = x + itemW * idx + itemW / 2;
@@ -224,13 +224,13 @@ export default class Renderer {
         ctx.stroke();
 
         ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-        ctx.font = `${this.p(12)}px sans-serif`;
+        ctx.font = `${this.p(16)}px sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.fillText('目标水位', cx, y + this.p(12));
 
         ctx.fillStyle = '#64d2ff';
-        ctx.font = `bold ${this.p(28)}px sans-serif`;
+        ctx.font = `bold ${this.p(36)}px sans-serif`;
         ctx.shadowColor = 'rgba(100, 210, 255, 0.5)';
         ctx.shadowBlur = this.p(10);
         ctx.fillText(`${model.targetWaterLevel}% (±${model.allowedError}%)`, cx, y + this.p(35));
@@ -396,12 +396,6 @@ export default class Renderer {
         ctx.stroke();
         ctx.setLineDash([]);
 
-        ctx.fillStyle = 'rgba(255, 180, 180, 0.8)';
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'middle';
-        ctx.font = `bold ${this.p(10) * scale}px sans-serif`;
-        ctx.fillText('目标', w + this.p(18) * scale, targetLineY + this.p(4) * scale);
-
         ctx.restore();
     }
 
@@ -451,7 +445,7 @@ export default class Renderer {
         ctx.textBaseline = 'middle';
         ctx.font = `${this.p(24)}px sans-serif`;
         ctx.fillText('💧', 0, -this.p(6));
-        ctx.font = `bold ${this.p(13)}px sans-serif`;
+        ctx.font = `bold ${this.p(17)}px sans-serif`;
         ctx.fillText('按住倒水', 0, this.p(18));
 
         ctx.restore();
@@ -459,7 +453,7 @@ export default class Renderer {
         // 提示文字 (在按钮下方)
         const hintY = pourBtnY + btnRadius + this.p(18);
         ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-        ctx.font = `${this.p(12)}px sans-serif`;
+        ctx.font = `${this.p(16)}px sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.fillText('按住按钮开始倒水，松开停止', cx, hintY);
@@ -512,7 +506,7 @@ export default class Renderer {
         }
 
         ctx.fillStyle = '#fff';
-        ctx.font = `bold ${this.p(12)}px sans-serif`;
+        ctx.font = `bold ${this.p(16)}px sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.shadowBlur = 0;
