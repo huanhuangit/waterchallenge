@@ -235,120 +235,6 @@ export default class Renderer {
 
         drawItem('回合', model.round, 0);
         drawItem('得分', model.score, 1);
-        // --- 使用新的 UI Scale System 计算布局 ---
-        const layout = this.calculateLayout(logicW, logicH);
-
-        // 保存布局信息供交互使用
-        this.layoutInfo = {
-            cardW: layout.cardW,
-            gameAreaH: layout.gameAreaH,
-            uiScale: layout.uiScale,
-            glassScale: layout.uiScale // glassScale 也可以跟随 uiScale
-        };
-
-        this.layout = {
-            controlsY: layout.controlsY,
-            centerX: logicW / 2
-        };
-
-        // 卡片尺寸
-        const cardX = (logicW - layout.cardW) / 2;
-        const cardH = layout.gameAreaH + layout.headerH + layout.statsH + layout.targetH + layout.controlsH + layout.topPadding; // rough total used
-
-        // 绘制各部分 (传入 layout 对象)
-        this.drawHeader(ctx, logicW / 2, layout.headerY, layout.headerH, layout.uiScale);
-        this.drawStats(ctx, logicW / 2, layout.statsY, layout.statsH, layout.cardW - 30 * layout.uiScale, gameModel, layout.uiScale);
-        // 注意：target, gameArea, controls 下一步更新
-        this.drawTargetDisplay(ctx, logicW / 2, layout.targetY, layout.targetH, layout.cardW - 30 * layout.uiScale, gameModel, layout.uiScale);
-        this.drawGameArea(ctx, logicW / 2, layout.gameAreaY, layout.gameAreaH, gameModel, layout.uiScale);
-        this.drawControls(ctx, logicW / 2, layout.controlsY, layout.controlsH, layout.cardW - 30 * layout.uiScale, gameModel, layout.uiScale);
-    }
-
-    drawBackground(ctx, w, h) {
-        const grad = ctx.createLinearGradient(0, 0, w, h);
-        grad.addColorStop(0, '#1a1a2e');
-        grad.addColorStop(0.5, '#16213e');
-        grad.addColorStop(1, '#0f3460');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, w, h);
-    }
-
-    drawCard(ctx, x, y, w, h) {
-        // 卡片绘制逻辑已简化或移除，直接绘制各部分
-    }
-
-    drawHeader(ctx, lcx, ly, lh, uiScale = 1.0) {
-        const cx = this.p(lcx);
-        const y = this.p(ly);
-        const h = this.p(lh);
-
-        // 动态计算字体大小
-        const fontSize = 24 * uiScale;
-        const subFontSize = 14 * uiScale;
-
-        // 垂直居中偏移
-        const titleY = y + h * 0.30; // 0.35 -> 0.30 (上移)
-        const subY = y + h * 0.85;   // 0.75 -> 0.85 (下移)
-
-        ctx.fillStyle = '#ffffff';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.font = `bold ${this.p(fontSize)}px sans-serif`;
-        ctx.shadowColor = 'rgba(100, 200, 255, 0.5)';
-        ctx.shadowBlur = this.p(12 * uiScale);
-        ctx.fillText('💧 接水大挑战', cx, titleY);
-
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-        ctx.font = `${this.p(subFontSize)}px sans-serif`;
-        ctx.fillText('控制水位，挑战精准度！', cx, subY);
-    }
-
-    drawStats(ctx, lcx, ly, lh, lw, model, uiScale = 1.0) {
-        const cx = this.p(lcx);
-        const y = this.p(ly);
-        const h = this.p(lh);
-        const w = this.p(lw);
-        const x = cx - w / 2;
-
-        ctx.save();
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
-        this.roundRect(ctx, x, y, w, h, this.p(10 * uiScale));
-        ctx.fill();
-
-        const itemW = w / 3;
-
-        // 动态字体大小
-        const labelSize = this.p(13 * uiScale);
-        const valueSize = this.p(24 * uiScale);
-        const subSize = this.p(11 * uiScale);
-
-        // 垂直居中分布 (拉大间距)
-        const labelY = y + h * 0.20; // 0.22 -> 0.20
-        const valueY = y + h * 0.52; // 0.50 -> 0.52
-        const subY = y + h * 0.80;   // 0.78 -> 0.80
-
-        const drawItem = (label, value, idx, subText = null) => {
-            const ix = x + itemW * idx + itemW / 2;
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-            ctx.font = `${labelSize}px sans-serif`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(label, ix, labelY);
-
-            ctx.fillStyle = '#64d2ff';
-            ctx.font = `bold ${valueSize}px sans-serif`;
-            ctx.fillText(value, ix, valueY);
-
-            if (subText) {
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-                ctx.font = `${subSize}px sans-serif`;
-                ctx.fillText(subText, ix, subY);
-            }
-        };
-
-        drawItem('回合', model.round, 0);
-        drawItem('得分', model.score, 1);
         drawItem('最高分', model.highScore, 2, model.highScoreTime);
 
         ctx.restore();
@@ -592,8 +478,51 @@ export default class Renderer {
         ctx.save();
         ctx.translate(cx, pourBtnY);
 
+        // 判断是否时间已用完
+        const isDisabled = model.timeExpired;
+
+        // 绘制倒计时圆环（在按钮外围）
+        if (model.isPouring || model.remainingPourTime < model.maxPourTime) {
+            const progress = model.remainingPourTime / model.maxPourTime;
+            const ringRadius = btnRadius + this.p(8 * uiScale); // 圆环半径比按钮大一些
+            const ringWidth = this.p(6 * uiScale); // 圆环宽度
+
+            // 绘制背景圆环（灰色）
+            ctx.beginPath();
+            ctx.arc(0, 0, ringRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.lineWidth = ringWidth;
+            ctx.stroke();
+
+            // 绘制进度圆环（从顶部开始，顺时针）
+            if (progress > 0) {
+                ctx.beginPath();
+                // 从 -90度（顶部）开始，顺时针绘制
+                const startAngle = -Math.PI / 2;
+                const endAngle = startAngle + Math.PI * 2 * progress;
+                ctx.arc(0, 0, ringRadius, startAngle, endAngle);
+
+                // 根据剩余时间改变颜色
+                if (progress > 0.5) {
+                    ctx.strokeStyle = '#64d2ff'; // 蓝色
+                } else if (progress > 0.3) {
+                    ctx.strokeStyle = '#ffa500'; // 橙色
+                } else {
+                    ctx.strokeStyle = '#ff6b6b'; // 红色警告
+                }
+
+                ctx.lineWidth = ringWidth;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            }
+        }
+
         const btnGrad = ctx.createLinearGradient(-btnRadius, -btnRadius, btnRadius, btnRadius);
-        if (model.isPouring) {
+        if (isDisabled) {
+            // 置灰状态
+            btnGrad.addColorStop(0, '#555555');
+            btnGrad.addColorStop(1, '#333333');
+        } else if (model.isPouring) {
             btnGrad.addColorStop(0, '#3a9fc9');
             btnGrad.addColorStop(1, '#2a7f9f');
             ctx.scale(0.95, 0.95);
@@ -607,7 +536,7 @@ export default class Renderer {
         ctx.fillStyle = btnGrad;
         ctx.fill();
 
-        if (!model.isPouring) {
+        if (!model.isPouring && !isDisabled) {
             ctx.shadowColor = 'rgba(100, 210, 255, 0.4)';
             ctx.shadowBlur = this.p(10 * uiScale);
             ctx.shadowOffsetY = this.p(4 * uiScale);
@@ -619,14 +548,14 @@ export default class Renderer {
         const iconOffsetY = -this.p(6 * uiScale);
         const textOffsetY = this.p(14 * uiScale);
 
-        ctx.fillStyle = '#fff';
+        ctx.fillStyle = isDisabled ? '#888888' : '#fff';
         ctx.textAlign = 'center';
         ctx.shadowBlur = 0;
         ctx.textBaseline = 'middle';
         ctx.font = `${iconSize}px sans-serif`;
         ctx.fillText('💧', 0, iconOffsetY);
         ctx.font = `bold ${textSize}px sans-serif`;
-        ctx.fillText('按住倒水', 0, textOffsetY);
+        ctx.fillText(isDisabled ? '时间已用完' : '按住倒水', 0, textOffsetY);
 
         ctx.restore();
 

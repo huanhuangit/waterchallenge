@@ -81,7 +81,10 @@ export default class Main {
 
         // 倒水按钮
         if (this.isInCircle(cx, cy, r.pourBtnArea)) {
-            this.game.startPouring();
+            // 只有在时间未用完时才能倒水
+            if (!this.game.timeExpired) {
+                this.game.startPouring();
+            }
         }
 
         // 确认按钮
